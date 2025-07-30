@@ -16,7 +16,10 @@ class ProductUsecase:
 
     async def create(self, body: ProductIn) -> ProductOut:
         product_model = ProductModel(**body.model_dump())
-        await self.collection.insert_one(product_model.model_dump())
+        try:
+            await self.collection.insert_one(product_model.model_dump())
+        except InsertionException:
+            raise HTTPException(message=f"Product not found with filter")
 
         return ProductOut(**product_model.model_dump())
 

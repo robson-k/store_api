@@ -13,8 +13,10 @@ router = APIRouter(tags=["products"])
 async def post(
     body: ProductIn = Body(...), usecase: ProductUsecase = Depends()
 ) -> ProductOut:
-    return await usecase.create(body=body)
-
+    try:
+        return await usecase.create(body=body)
+    except NotFoundException as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=exc.message)
 
 @router.get(path="/{id}", status_code=status.HTTP_200_OK)
 async def get(
